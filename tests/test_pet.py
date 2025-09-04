@@ -120,7 +120,7 @@ class TestPet:
             assert response_json['status'] == payload['status']
 
     @allure.title("Удаление питомца по id ")
-    def test_update_information_pet(self, create_pet):
+    def test_delete_pet_by_id(self, create_pet):
         with allure.step("Получение id созданного питомца"):
             pet_id = create_pet["id"]
         with allure.step("Отправка запроса на удаление питомца"):
@@ -131,7 +131,3 @@ class TestPet:
             response = requests.get(url=f"{BASE_URL}/pet/{pet_id}")
         with allure.step("Проверка статуса ответа"):
             assert response.status_code == 404
-
-
-
-
