@@ -2,6 +2,8 @@ import allure
 import jsonschema
 import pytest
 import requests
+from .schemas.store_schema import STORE_SCHEMA
+from .schemas.store_schema import INVENTORY_STORE_SCHEMA
 
 BASE_URL = "http://5.181.109.28:9090/api/v3"
 
@@ -14,15 +16,16 @@ class TestStore:
             payload = {
                 "id": 1,
                 "petId": 1,
-                "quantity": 1,
-                "status": "placed",
+                "quantity": 7,
+                "status": "approved",
                 "complete": True
             }
         with allure.step("Отправка запроса на размещение заказа"):
             response = requests.post(url=f"{BASE_URL}/store/order", json=payload)
             response_json = response.json()
-        with allure.step("Проверка статуса ответа"):
+        with allure.step("Проверка статуса ответа и валиация Json схемы"):
             assert response.status_code == 200
+            jsonschema.validate(response_json, STORE_SCHEMA)
         with allure.step("Проверка содержимого ответа"):
             assert response_json["id"] == payload["id"], "id заказа не совпадает с ожидаемым"
             assert response_json["petId"] == payload["petId"], "petid заказа не совпадает с ожидаемым"
@@ -61,10 +64,10 @@ class TestStore:
     def test_get_information_inventory_store(self):
         with allure.step("Отправка запроса на получение информации о инвентаре магазина"):
             response = requests.get(url=f"{BASE_URL}/store/inventory")
-        with allure.step("Проверка статуса ответа"):
+            response_json = response.json()
+        with allure.step("Проверка статуса ответа и валидации Json схемы"):
              assert response.status_code == 200, "Код ответа не совпал с ожидаемым"
-        with allure.step("Проверка данных инвентаря в ответе"):
-            assert response.json() == {"approved":57,"delivered":50}, "Данные ответа не совпали с ожидаемыми"
+             jsonschema.validate(response_json, INVENTORY_STORE_SCHEMA)
 
 
 
